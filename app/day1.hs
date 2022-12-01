@@ -43,4 +43,4 @@ main =
                             do
                                 print $ solveP1 elfs
                                 print $ solveP2 elfs
-            _ -> putStrLn "Use: day22 input"
+            _ -> putStrLn "Use: day1 input"
