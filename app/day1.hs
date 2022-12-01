@@ -1,5 +1,5 @@
 module Main where
-import System.Environment (getArgs)
+import System.Environment (getArgs, getProgName)
 import Text.Parsec (
      parse
     ,many1
@@ -33,6 +33,7 @@ main :: IO ()
 main =
     do
         args <- getArgs
+        prog <- getProgName
         case args of
             [inputFile] ->
                 do
@@ -43,4 +44,4 @@ main =
                             do
                                 print $ solveP1 elfs
                                 print $ solveP2 elfs
-            _ -> putStrLn "Use: day1 input"
+            _ -> putStrLn $ "Use: "++prog++" input"
