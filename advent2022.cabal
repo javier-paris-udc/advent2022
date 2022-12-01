@@ -1,0 +1,19 @@
+cabal-version:      2.4
+name:               advent2022
+version:            0.1.0.0
+synopsis: Solutions to the 2022 advent of code
+
+license:            BSD-3-Clause
+author:             Javier París
+maintainer:         javier.paris@udc.es
+
+extra-source-files:
+    CHANGELOG.md
+    README.md
+
+executable day1
+    main-is:          day1.hs
+    build-depends:    base ^>=4.16.3.0,
+                      parsec ^>= 3.1
+    hs-source-dirs:   app
+    default-language: Haskell2010
