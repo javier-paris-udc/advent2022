@@ -4,10 +4,7 @@ import Text.Parsec (
      parse
     ,many1
     ,digit
-    ,sepBy1
     ,newline
-    ,notFollowedBy
-    ,eof
     ,sepEndBy1)
 import Text.Parsec.String (Parser)
 import Data.List (sortBy)
@@ -23,7 +20,7 @@ solveP1 = fmap sum >>> maximum
 
 
 elfsP :: Parser [[Int]]
-elfsP = elfP `sepBy1` newline
+elfsP = elfP `sepEndBy1` newline
   where
     elfP = intP `sepEndBy1` newline
     intP = read <$> many1 digit
