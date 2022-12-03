@@ -20,10 +20,6 @@ priority c
 group :: Int -> [a] -> [[a]]
 group n = unfoldr (\l -> if null l then Nothing else Just (splitAt n l))
 
-badges :: [String] -> [Char]
-badges (s1:s2:s3:ss) = head (s1 `intersect` s2 `intersect` s3):badges ss
-badges            [] = []
-
 
 solveP2 :: [String] -> Int
 solveP2 = sum . map (priority . head . foldl1' intersect) . group 3
