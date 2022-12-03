@@ -1,12 +1,11 @@
 module Main where
-import System.Environment (getArgs, getProgName)
 import Text.Parsec (
-     parse
-    ,many1
+     many1
     ,digit
     ,newline
     ,sepEndBy1)
 import Text.Parsec.String (Parser)
+import AoC (applyInput)
 import Data.List (sortBy)
 import Control.Arrow ((>>>))
 
@@ -27,18 +26,4 @@ elfsP = elfP `sepEndBy1` newline
 
 
 main :: IO ()
-main =
-    do
-        args <- getArgs
-        prog <- getProgName
-        case args of
-            [inputFile] ->
-                do
-                    input <- readFile inputFile
-                    case parse elfsP  "" input of
-                        Left err -> print err
-                        Right elfs ->
-                            do
-                                print $ solveP1 elfs
-                                print $ solveP2 elfs
-            _ -> putStrLn $ "Use: "++prog++" input"
+main = applyInput elfsP solveP1 solveP2

@@ -1,13 +1,12 @@
 module Main where
-import System.Environment (getArgs, getProgName)
 import Text.Parsec (
-     parse
-    ,newline
+     newline
     ,(<|>)
     ,char
     ,space
     ,sepEndBy1)
 import Text.Parsec.String (Parser)
+import AoC (applyInput)
 
 type Play = (Int, Int)
 
@@ -55,18 +54,4 @@ gameP = playP `sepEndBy1` newline
 
 
 main :: IO ()
-main =
-    do
-        args <- getArgs
-        prog <- getProgName
-        case args of
-            [inputFile] ->
-                do
-                    input <- readFile inputFile
-                    case parse gameP inputFile input of
-                        Left err -> print err
-                        Right plays ->
-                            do
-                                print $ solveP1 plays
-                                print $ solveP2 plays
-            _ -> putStrLn $ "Use: "++prog++" input"
+main = applyInput gameP solveP1 solveP2

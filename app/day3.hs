@@ -1,12 +1,11 @@
 module Main where
-import System.Environment (getArgs, getProgName)
 import Text.Parsec (
-     parse
-    ,newline
+     newline
     ,many1
     ,letter
     ,sepEndBy1)
 import Text.Parsec.String (Parser)
+import AoC (applyInput)
 import Data.Char (isLower, ord)
 import Data.List (intersect, unfoldr, foldl1')
 
@@ -37,18 +36,4 @@ backPacksP = many1 letter `sepEndBy1` newline
 
 
 main :: IO ()
-main =
-    do
-        args <- getArgs
-        prog <- getProgName
-        case args of
-            [inputFile] ->
-                do
-                    input <- readFile inputFile
-                    case parse backPacksP inputFile input of
-                        Left err -> print err
-                        Right backPacks ->
-                            do
-                                print $ solveP1 backPacks
-                                print $ solveP2 backPacks
-            _ -> putStrLn $ "Use: "++prog++" input"
+main = applyInput backPacksP solveP1 solveP2
