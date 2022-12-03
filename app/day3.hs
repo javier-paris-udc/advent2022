@@ -8,7 +8,7 @@ import Text.Parsec (
     ,sepEndBy1)
 import Text.Parsec.String (Parser)
 import Data.Char (isLower, ord)
-import Data.List (intersect)
+import Data.List (intersect, unfoldr, foldl1')
 
 
 priority :: Char -> Int
@@ -17,13 +17,16 @@ priority c
     | otherwise = ord c - ord 'A' + 27
 
 
+group :: Int -> [a] -> [[a]]
+group n = unfoldr (\l -> if null l then Nothing else Just (splitAt n l))
+
 badges :: [String] -> [Char]
 badges (s1:s2:s3:ss) = head (s1 `intersect` s2 `intersect` s3):badges ss
 badges            [] = []
 
 
 solveP2 :: [String] -> Int
-solveP2 = sum . map priority . badges
+solveP2 = sum . map (priority . head . foldl1' intersect) . group 3
 
 
 solveP1 :: [String] -> Int
