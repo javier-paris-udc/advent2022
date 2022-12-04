@@ -30,3 +30,7 @@ executable day2
 executable day3
     import:           shared_properties
     main-is:          day3.hs
+
+executable day4
+    import:           shared_properties
+    main-is:          day4.hs

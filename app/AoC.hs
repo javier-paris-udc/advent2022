@@ -1,10 +1,19 @@
 module AoC where
 
-import Text.Parsec (parse)
+import Text.Parsec (parse, char, (<|>), many1, digit, option)
 import Text.Parsec.String (Parser)
 import System.Environment (getArgs, getProgName)
 
-applyInput :: Show b => Parser a -> (a -> b) -> (a -> b) -> IO ()
+
+intP :: Parser Int
+intP =
+    do
+        sign <- option 1 (char '-' >> return (-1))
+        num  <- read <$> many1 digit
+        return (num * sign)
+
+
+applyInput :: (Show b, Show c) => Parser a -> (a -> b) -> (a -> c) -> IO ()
 applyInput parser solveP1 solveP2 =
     do
         args <- getArgs
