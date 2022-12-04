@@ -9,19 +9,18 @@ type Sec     = (Int, Int)
 type SecPair = (Sec, Sec)
 
 
-inside :: Int -> Sec -> Bool
-inside x (l, r) = x >= l && x <= r
+within :: Int -> Sec -> Bool
+within x (l, r) = x >= l && x <= r
 
 
 overlap :: SecPair -> Bool
 overlap (p1@(from1, to1) , p2@(from2, to2)) =
-    from1 `inside` p2 || to1 `inside` p2 || from2 `inside` p1 || to2 `inside` p1
+    from1 `within` p2 || to1 `within` p2 || from2 `within` p1 || to2 `within` p1
 
 
 contained :: SecPair -> Bool
 contained (p1@(from1, to1), p2@(from2, to2)) =
-    (from1 `inside` p2 && to1 `inside` p2) ||
-    (from2 `inside` p1 && to2 `inside` p1)
+    (from1 `within` p2 && to1 `within` p2) || (from2 `within` p1 && to2 `within` p1)
 
 
 solveP2 :: [SecPair] -> Int
