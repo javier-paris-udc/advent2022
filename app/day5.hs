@@ -1,11 +1,20 @@
 module Main where
-import AoC (applyInput, intP)
-import Data.Map (Map, (!))
-import qualified Data.Map as Map
-import Text.Parsec.String (Parser)
-import Text.Parsec (sepEndBy1, spaces, string, newline, sepBy1, char, (<|>), anyChar, try)
-import Data.List (transpose, foldl')
-import Data.Maybe (fromJust, isJust, catMaybes)
+
+import           AoC                (applyInput, intP)
+import           Data.Map           (Map, (!))
+import qualified Data.Map           as Map
+import           Text.Parsec.String (Parser)
+import           Text.Parsec        (sepEndBy1
+                                    ,spaces
+                                    ,string
+                                    ,newline
+                                    ,sepBy1
+                                    ,char
+                                    ,(<|>)
+                                    ,anyChar
+                                    ,try)
+import           Data.List          (transpose, foldl')
+import           Data.Maybe         (fromJust, isJust, catMaybes)
 
 
 type Stack = Map Int [Char]
