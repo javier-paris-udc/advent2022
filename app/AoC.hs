@@ -1,7 +1,7 @@
 module AoC where
 
-import Text.Parsec (parse, char, (<|>), many1, digit, option)
-import Text.Parsec.String (Parser)
+import Text.Parsec (char, (<|>), many1, digit, option)
+import Text.Parsec.String (Parser, parseFromFile)
 import System.Environment (getArgs, getProgName)
 
 
@@ -21,8 +21,8 @@ applyInput parser solveP1 solveP2 =
         case args of
             [inputFile] ->
                 do
-                    input <- readFile inputFile
-                    case parse parser inputFile input of
+                    parseRes <- parseFromFile parser inputFile
+                    case parseRes of
                         Left err ->
                             print err
                         Right parsedRes ->
