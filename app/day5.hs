@@ -42,11 +42,6 @@ solveP1 :: StackSt -> String
 solveP1 (st, ops) = map head $ Map.elems $ foldl' (doOp reverse) st ops
 
 
-buildMap :: [Int] -> [[Char]] -> Map Int [Char]
-buildMap keys values =
-    foldl' (\m (k,v) -> Map.insert k v m) Map.empty (zip keys values)
-
-
 elemP :: Parser (Maybe Char)
 elemP = do
     emptyP <|> charP
@@ -63,7 +58,7 @@ stackP = do
     let values = catMaybes <$> transpose rows
     spaces
     keys <- intP `sepBy1` try (string "   ")
-    return $ buildMap keys values
+    return $ Map.fromList (zip keys values)
 
 
 opP :: Parser Op
