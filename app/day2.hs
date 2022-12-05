@@ -1,12 +1,12 @@
 module Main where
-import Text.Parsec (
-     newline
-    ,(<|>)
-    ,char
-    ,space
-    ,sepEndBy1)
+
+import Text.Parsec        (newline
+                          ,(<|>)
+                          ,char
+                          ,space
+                          ,sepEndBy1)
 import Text.Parsec.String (Parser)
-import AoC (applyInput)
+import AoC                (applyInput)
 
 type Play = (Int, Int)
 
@@ -40,7 +40,7 @@ solveP2 p = solveP1 plays
 
 
 solveP1 :: [Play] -> Int
-solveP1 p = sum (scoreRound <$> p) + sum (((+1).snd) <$> p)
+solveP1 p = sum (scoreRound <$> p) + sum ((+1).snd <$> p)
 
 
 gameP :: Parser [Play]

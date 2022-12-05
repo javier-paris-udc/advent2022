@@ -1,8 +1,9 @@
 module Main where
-import AoC (applyInput, intP)
+
+import AoC                (applyInput, intP)
 import Text.Parsec.String (Parser)
-import Text.Parsec (sepEndBy1, newline, char)
-import Foreign (intPtrToPtr)
+import Text.Parsec        (sepEndBy1, newline, char)
+import Foreign            (intPtrToPtr)
 
 
 type Sec     = (Int, Int)

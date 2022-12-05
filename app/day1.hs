@@ -1,13 +1,13 @@
 module Main where
-import Text.Parsec (
-     many1
-    ,digit
-    ,newline
-    ,sepEndBy1)
+
+import Text.Parsec        (many1
+                          ,digit
+                          ,newline
+                          ,sepEndBy1)
 import Text.Parsec.String (Parser)
-import AoC (applyInput)
-import Data.List (sortBy)
-import Control.Arrow ((>>>))
+import AoC                (applyInput)
+import Data.List          (sortBy)
+import Control.Arrow      ((>>>))
 
 
 solveP2 :: [[Int]] -> Int

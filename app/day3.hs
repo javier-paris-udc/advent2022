@@ -1,13 +1,13 @@
 module Main where
-import Text.Parsec (
-     newline
-    ,many1
-    ,letter
-    ,sepEndBy1)
+
+import Text.Parsec        (newline
+                          ,many1
+                          ,letter
+                          ,sepEndBy1)
 import Text.Parsec.String (Parser)
-import AoC (applyInput)
-import Data.Char (isLower, ord)
-import Data.List (intersect, unfoldr, foldl1')
+import AoC                (applyInput)
+import Data.Char          (isLower, ord)
+import Data.List          (intersect, unfoldr, foldl1')
 
 
 priority :: Char -> Int
