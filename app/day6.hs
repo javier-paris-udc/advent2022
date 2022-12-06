@@ -7,7 +7,7 @@ import Data.Maybe         (fromJust)
 
 
 nonRepeating :: (Eq a, Ord a) => [a] -> Bool
-nonRepeating = all ((==1).length) . group . sort
+nonRepeating = all (null.tail) . group . sort
 
 
 findNonRepeat :: Int -> String -> Int
