@@ -36,4 +36,4 @@ backPacksP = many1 letter `sepEndBy1` newline
 
 
 main :: IO ()
-main = applyInput backPacksP solveP1 solveP2
+main = applyInput backPacksP () solveP1 solveP2

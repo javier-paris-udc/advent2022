@@ -28,4 +28,4 @@ stringP = many1 letter
 
 
 main :: IO ()
-main = applyInput stringP solveP1 solveP2
+main = applyInput stringP () solveP1 solveP2

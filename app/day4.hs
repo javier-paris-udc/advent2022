@@ -55,4 +55,4 @@ secPairListP = secPairP `sepEndBy1` newline
 
 
 main :: IO ()
-main = applyInput secPairListP solveP1 solveP2
+main = applyInput secPairListP () solveP1 solveP2

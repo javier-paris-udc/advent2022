@@ -54,4 +54,4 @@ gameP = playP `sepEndBy1` newline
 
 
 main :: IO ()
-main = applyInput gameP solveP1 solveP2
+main = applyInput gameP () solveP1 solveP2
