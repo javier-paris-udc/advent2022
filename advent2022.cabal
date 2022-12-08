@@ -48,3 +48,8 @@ executable day7
     import:           shared_properties
     build-depends:    containers ^>=0.6
     main-is:          day7.hs
+
+executable day8
+    import:           shared_properties
+    build-depends:    array ^>=0.5
+    main-is:          day8.hs
