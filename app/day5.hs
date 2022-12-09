@@ -82,4 +82,4 @@ stackStP = do
 
 
 main :: IO ()
-main = applyInput stackStP () solveP1 solveP2
+main = applyInput stackStP solveP1 solveP2

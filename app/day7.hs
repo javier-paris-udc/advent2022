@@ -13,7 +13,7 @@ import           Text.Parsec ((<|>)
                              ,sepEndBy1
                              ,spaces
                              ,string)
-import           AoC         (applyInput, blanksP, intP)
+import           AoC         (applyInputS, blanksP, intP)
 import           Data.Map    (Map, (!))
 import qualified Data.Map    as Map
 import           Data.Char   (isSpace)
@@ -101,4 +101,4 @@ entryMapP = do
 
 
 main :: IO ()
-main = applyInput entryMapP ["/"] solveP1 solveP2
+main = applyInputS entryMapP ["/"] solveP1 solveP2

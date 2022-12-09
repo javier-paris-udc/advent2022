@@ -9,7 +9,7 @@ import Text.Parsec        (char
                           ,ParseError
                           ,Parsec, runParser)
 import Text.Parsec.Pos    (SourceName)
-import Text.Parsec.String (parseFromFile)
+import Text.Parsec.String (Parser)
 import System.Environment (getArgs, getProgName)
 import Control.Monad      (void)
 
@@ -30,8 +30,12 @@ blanksP :: Parsec String a ()
 blanksP = void $ many1 blankP
 
 
-applyInput :: (Show b, Show c) => Parsec String s a -> s -> (a -> b) -> (a -> c) -> IO ()
-applyInput parser state solveP1 solveP2 =
+applyInput :: (Show b, Show c) => Parser a -> (a -> b) -> (a -> c) -> IO ()
+applyInput = flip applyInputS ()
+
+
+applyInputS :: (Show b, Show c) => Parsec String s a -> s -> (a -> b) -> (a -> c) -> IO ()
+applyInputS parser state solveP1 solveP2 =
     do
         args <- getArgs
         prog <- getProgName

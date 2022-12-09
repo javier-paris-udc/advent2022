@@ -26,4 +26,4 @@ elfsP = elfP `sepEndBy1` newline
 
 
 main :: IO ()
-main = applyInput elfsP () solveP1 solveP2
+main = applyInput elfsP solveP1 solveP2

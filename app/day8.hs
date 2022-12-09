@@ -65,4 +65,4 @@ arrayP = do
 
 
 main :: IO ()
-main = applyInput arrayP () solveP1 solveP2
+main = applyInput arrayP solveP1 solveP2
