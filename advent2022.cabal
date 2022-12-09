@@ -53,3 +53,9 @@ executable day8
     import:           shared_properties
     build-depends:    array ^>=0.5
     main-is:          day8.hs
+
+executable day9
+    import:           shared_properties
+    build-depends:    bifunctors ^>=5.5,
+                      containers ^>=0.6
+    main-is:          day9.hs
