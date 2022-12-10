@@ -23,7 +23,7 @@ groupIn n = unfoldr (\l -> if null l then Nothing else Just $ splitAt n l)
 
 
 solveP2 :: RegValues -> String
-solveP2 v = (++ "\n") $ intercalate "\n" $ groupIn 40 $ map pixelAt [0..239]
+solveP2 v = intercalate "\n" $ groupIn 40 $ map pixelAt [0..239]
   where
     pixelAt i
         | distance (v ! i) (i `rem` 40) < 2  = '#'
