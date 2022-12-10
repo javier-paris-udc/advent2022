@@ -59,3 +59,8 @@ executable day9
     build-depends:    bifunctors ^>=5.5,
                       containers ^>=0.6
     main-is:          day9.hs
+
+executable day10
+    import:           shared_properties
+    build-depends:    vector ^>=0.13
+    main-is:          day10.hs
