@@ -9,7 +9,8 @@ import Text.Parsec        (char
                           ,ParseError
                           ,Parsec
                           ,runParser
-                          ,spaces)
+                          ,spaces
+                          ,try)
 import Text.Parsec.Pos    (SourceName)
 import Text.Parsec.String (Parser)
 import System.Environment (getArgs, getProgName)
@@ -34,7 +35,7 @@ blanksP = void $ many1 blankP
 
 
 commaSepP :: Parsec String a ()
-commaSepP = spaces >> char ',' >> spaces
+commaSepP = try $ spaces >> char ',' >> spaces
 
 
 parseFromArg :: Parsec String s a -> s -> IO (Either String a)

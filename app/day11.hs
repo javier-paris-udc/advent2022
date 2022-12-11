@@ -35,7 +35,7 @@ giveItem :: (Int -> Int) -> Int -> State (IntMap Monkey) ()
 giveItem test worry =
     modify $ Map.adjust (addItem worry) (test worry)
   where
-    addItem i Monkey { .. } = Monkey { items = worry : items, ..}
+    addItem i Monkey { .. } = Monkey { items = worry : items, .. }
 
 
 monkeyRound :: (Int -> Int) -> Int -> State (IntMap Monkey) ()
@@ -81,7 +81,7 @@ solveP1 = solve (`div` 3) 20
 itemsP :: Parser [Int]
 itemsP = do
     string "Starting items: "
-    intP `sepBy` commaSepP
+    intP `sepEndBy` commaSepP
 
 
 operationP :: Parser (Int -> Int)
