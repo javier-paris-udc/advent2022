@@ -35,7 +35,7 @@ giveItem :: (Int -> Int) -> Int -> State (IntMap Monkey) ()
 giveItem test worry =
     modify $ Map.adjust (addItem worry) (test worry)
   where
-    addItem i Monkey { .. } = Monkey { items = worry : items, ..} --items = items |> worry, ..}
+    addItem i Monkey { .. } = Monkey { items = worry : items, ..}
 
 
 monkeyRound :: (Int -> Int) -> Int -> State (IntMap Monkey) ()
