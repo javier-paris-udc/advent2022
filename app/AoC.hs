@@ -7,7 +7,9 @@ import Text.Parsec        (char
                           ,option
                           ,oneOf
                           ,ParseError
-                          ,Parsec, runParser)
+                          ,Parsec
+                          ,runParser
+                          ,spaces)
 import Text.Parsec.Pos    (SourceName)
 import Text.Parsec.String (Parser)
 import System.Environment (getArgs, getProgName)
@@ -29,6 +31,10 @@ blankP = void $ oneOf " \t"
 
 blanksP :: Parsec String a ()
 blanksP = void $ many1 blankP
+
+
+commaSepP :: Parsec String a ()
+commaSepP = spaces >> char ',' >> spaces
 
 
 parseFromArg :: Parsec String s a -> s -> IO (Either String a)

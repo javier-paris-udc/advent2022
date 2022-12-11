@@ -64,3 +64,9 @@ executable day10
     import:           shared_properties
     build-depends:    vector ^>=0.13
     main-is:          day10.hs
+
+executable day11
+    import:           shared_properties
+    build-depends:    containers ^>=0.6,
+                      mtl ^>=2.3
+    main-is:          day11.hs
