@@ -33,13 +33,16 @@ right :: Coord -> Coord
 right = second (+1)
 
 
-moveFrom :: Elevation -> Coord -> [(Coord, Int)]
-moveFrom elevation c =
+moves :: (Int -> Int -> Bool) ->  Elevation -> Coord -> [(Coord, Int)]
+moves elevationTest elevation c =
     map (,1) $ filter canMove $ [up, down, left, right] <*> [c]
   where
     canMove x = inRange (bounds elevation) x
-             && elevation ! x <= elevation ! c + 1
+             && elevationTest (elevation ! c) (elevation ! x)
 
+
+
+--  Djistra algorithm
 
 binInsert :: (Ord b) => Seq ([a], b) -> ([a], b) -> Seq ([a], b)
 binInsert seq x@(path, cost) =
@@ -55,38 +58,47 @@ binInsert seq x@(path, cost) =
         mid = (left + right) `div` 2
 
 
-djistra :: (Eq a, Ord a, Ord b, Num b) => a -> a -> (a -> [(a, b)]) -> Maybe [a]
-djistra start end adj =
+djistra :: (Eq a, Ord a, Ord b, Num b)
+        => a
+        -> (a -> Bool)
+        -> (a -> [(a, b)])
+        -> Maybe [a]
+djistra start isEnd adj =
     runDjistra (Seq.singleton ([start], 0)) (Set.singleton start)
   where
     runDjistra next visited = case Seq.viewl next of
         Seq.EmptyL       -> Nothing
         (path@(pos : _), cost) :< rest
-            | pos == end -> Just (reverse path)
-            | otherwise  -> let newVertex  = expandPath visited pos
-                                newPaths   = bimap (:path) (+cost) <$> newVertex
-                                newVisited = Set.insert pos visited
-                                nextNoPos  = Seq.filter ((/= pos) . head . fst) next
-                                newNext    = foldl' binInsert nextNoPos newPaths
-                            in runDjistra newNext newVisited
+            | isEnd pos -> Just (reverse path)
+            | otherwise -> let newVertex  = expandPath visited pos
+                               newPaths   = bimap (:path) (+cost) <$> newVertex
+                               newVisited = Set.insert pos visited
+                               nextNoPos  = Seq.filter ((/= pos) . head . fst) next
+                               newNext    = foldl' binInsert nextNoPos newPaths
+                           in runDjistra newNext newVisited
     expandPath visited pos = filter ((`Set.notMember` visited) . fst) $ adj pos
 
 
-solve :: ((Coord, Coord), Elevation) -> Maybe Int
-solve ((start, end), elevation) =
-    subtract 1.length <$> djistra start end (moveFrom elevation)
+
+-- Solver functions
 
 
 solveP2 :: ((Coord, Coord), Elevation) -> Int
 solveP2 ((_, end), elevation) =
-    minimum $ mapMaybe (\c -> solve ((c, end), elevation)) as
+    subtract 1 $ length $ fromJust $  djistra end isA (moves downOne elevation)
   where
-    as = map fst $ filter ((==0).snd) $ assocs elevation
+    isA         = (==0).(elevation !)
+    downOne x y = x <= y + 1
 
 
 solveP1 :: ((Coord, Coord), Elevation) -> Int
-solveP1 = fromJust.solve
+solveP1 ((start, end), elevation) =
+    subtract 1 $ length $  fromJust $ djistra start (==end) (moves upOne elevation)
+  where
+    upOne x y = x >= y - 1
 
+
+-- Parsing
 
 type ParserState = (Int, (Maybe Int, Maybe Int))  -- pos, (start, end)
 type Parser = Parsec String ParserState
