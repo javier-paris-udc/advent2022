@@ -38,6 +38,13 @@ commaSepP :: Parsec String a ()
 commaSepP = try $ spaces >> char ',' >> spaces
 
 
+getParsedInput :: Parsec String s a -> s -> String -> IO a
+getParsedInput parser state file = do
+    fileContents <- readFile file
+    let Right parseRes = runParser parser state file fileContents
+    return parseRes
+
+
 parseFromArg :: Parsec String s a -> s -> IO (Either String a)
 parseFromArg parser state = do
     args <- getArgs
