@@ -1,16 +1,30 @@
 {-# LANGUAGE TupleSections #-}
 module Main where
 
-import AoC (applyInputS)
-import Text.Parsec (Parsec, getState, putState, lower, (<|>), char, many1, sepEndBy, newline, modifyState)
-import Data.Bifunctor (first, second, bimap)
-import Data.Char (ord)
-import Data.Array (Array, listArray, Ix (inRange), bounds, (!), assocs)
-import qualified Data.Sequence as Seq
-import qualified Data.Set as Set
-import Data.Sequence (ViewL((:<)), Seq)
-import Data.Foldable (foldl')
-import Data.Maybe (fromJust, catMaybes, mapMaybe)
+import           AoC            (applyInputS)
+import           Data.Array     (Array
+                                ,listArray
+                                ,Ix (inRange)
+                                ,bounds
+                                ,(!)
+                                ,assocs)
+import           Data.Bifunctor (first, second, bimap)
+import           Data.Char      (ord)
+import           Data.Foldable  (foldl')
+import           Data.Maybe     (fromJust, catMaybes, mapMaybe)
+import qualified Data.Sequence  as Seq
+import           Data.Sequence  (ViewL((:<)), Seq)
+import qualified Data.Set       as Set
+import           Text.Parsec    (Parsec
+                                ,getState
+                                ,putState
+                                ,lower
+                                ,(<|>)
+                                ,char
+                                ,many1
+                                ,sepEndBy
+                                ,newline
+                                ,modifyState)
 
 
 type Coord = (Int, Int)
@@ -67,7 +81,6 @@ djistra start isEnd adj =
     runDjistra (Seq.singleton ([start], 0)) (Set.singleton start)
   where
     runDjistra next visited = case Seq.viewl next of
-        Seq.EmptyL       -> Nothing
         (path@(pos : _), cost) :< rest
             | isEnd pos -> Just (reverse path)
             | otherwise -> let newVertex  = expandPath visited pos
@@ -76,6 +89,7 @@ djistra start isEnd adj =
                                nextNoPos  = Seq.filter ((/= pos) . head . fst) next
                                newNext    = foldl' binInsert nextNoPos newPaths
                            in runDjistra newNext newVisited
+        Seq.EmptyL      -> Nothing
     expandPath visited pos = filter ((`Set.notMember` visited) . fst) $ adj pos
 
 
