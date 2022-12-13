@@ -76,3 +76,7 @@ executable day12
     build-depends:    array ^>=0.5,
                       containers ^>=0.6
     main-is:          day12.hs
+
+executable day13
+    import:           shared_properties
+    main-is:          day13.hs
