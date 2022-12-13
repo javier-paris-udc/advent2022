@@ -3,7 +3,7 @@ module Main where
 import AoC                (applyInput, commaSepP, intP)
 import Control.Arrow      ((>>>))
 import Data.List          (findIndices, sort, unfoldr)
-import Text.Parsec        ((<|>), char, many, newline, sepBy, sepEndBy, spaces)
+import Text.Parsec        ((<|>), between, char, many, newline, sepBy, sepEndBy, spaces)
 import Text.Parsec.String (Parser)
 
 
@@ -46,9 +46,7 @@ solveP1 = groupsOf 2
 
 listP :: Parser Packet
 listP = do
-    char '['
-    packets <- packetP `sepBy` commaSepP
-    char ']'
+    packets <- between (char '[') (char ']') $ packetP `sepBy` commaSepP
     return $ L packets
   where
     packetP = listP <|> I <$> intP
