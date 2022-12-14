@@ -1,3 +1,4 @@
+{-# LANGUAGE BangPatterns #-}
 module Main where
 
 import           AoC                 (applyInput, blanksP, commaSepP, intP)
@@ -31,7 +32,7 @@ repeatDropSand :: (Coord -> CaveMap -> Bool) -> Int -> CaveMap -> Int
 repeatDropSand atEnd floor cave =
     iterate 0 cave
   where
-    iterate i cave =
+    iterate !i cave =
         case dropSand cave floor source of
            x | atEnd x cave -> i
              | otherwise    -> iterate (i+1) (Set.insert x cave)
