@@ -80,3 +80,8 @@ executable day12
 executable day13
     import:           shared_properties
     main-is:          day13.hs
+
+executable day14
+    import:           shared_properties
+    build-depends:    unordered-containers ^>=0.2
+    main-is:          day14.hs
