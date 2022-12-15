@@ -7,7 +7,7 @@ module Main where
 import AoC                (applyInput, commaSepP, intP)
 import Data.Function      ((&))
 import Data.Maybe         (mapMaybe)
-import Data.List          (foldl',  nub, sortOn)
+import Data.List          (foldl',  nub, sortOn, find)
 import Text.Parsec        (sepEndBy, spaces, string)
 import Text.Parsec.String (Parser)
 
@@ -86,9 +86,10 @@ solveP2 :: [Sensor] -> Int
 solveP2 sensors =
     let allSensorIntervals = (mapMaybe . sensorToRow <$> [0..problemSize]) <*> [sensors]
         fusedIntervals     = foldl' fuseList [] . sortOn start <$> allSensorIntervals
-        notFull            = filter (not . fullRow . fst) (zip fusedIntervals [0..])
+        notFull            = find (not . fullRow . fst) (zip fusedIntervals [0..])
     in case notFull of
-        [(intervals, row)]   -> row + 4_000_000 * findHole intervals
+        Nothing               -> undefined
+        Just (intervals, row) -> row + 4_000_000 * findHole intervals
   where
     findHole :: [Interval] -> Int
     findHole [i1, i2]
