@@ -34,7 +34,8 @@ data Valve = Valve {flow :: Int, tunnels :: HashMap String Int} deriving (Show, 
 data Path = Path {last :: HashMap Int String
                  ,path :: Set String
                  ,time :: HashMap Int Int
-                 ,totalFlow :: Int}
+                 ,totalFlow :: Int
+                 ,potential :: Int}
             deriving (Show, Eq)
 
 
@@ -52,7 +53,7 @@ search m n paths visited optimum =
                 alldsts  = map (filterCost p) nexts
                 newPaths = concatMap (filterVisited p) alldsts
             in case newPaths of
-                [] -> search m n ps visited (maxFlow optimum p)
+                [] -> search m n ps visited (maxFlow optimum p {potential = 0})
                 _  -> search m
                             n
                             (Seq.fromList newPaths >< ps)
@@ -66,26 +67,32 @@ search m n paths visited optimum =
 
     filterVisited p ((nxt, tNxt), dsts) = filter checkVisited $ addDst p nxt tNxt <$> dsts
 
-
     addDst p nxt t (dst, cost) =
-        let tLeft = t - cost - 1
+        let tLeft   = t - cost - 1
+            newPath = Set.insert dst p.path
         in Path {last      = Map.insert nxt dst p.last
-                ,path      = Set.insert dst p.path
+                ,path      = newPath
                 ,time      = Map.insert nxt tLeft p.time
-                ,totalFlow = p.totalFlow + tLeft * (m ! dst).flow }
+                ,totalFlow = p.totalFlow + tLeft * (m ! dst).flow
+                ,potential = potentialOf newPath tLeft}
+
+    potentialOf path tLeft =
+        tLeft * (sum $ fmap flow $ Map.filterWithKey (\k _ -> k `Set.notMember` path) m)
 
     checkPath p t (dst, cost) =
         t - cost - 1 >= 1 &&
         Set.notMember dst p.path
 
-    checkVisited (p:: Path) =
-        case Map.lookup (Set.fromList $ Map.elems p.last, p.path) visited of
-            Nothing -> True
-            Just (timeLeft, flow1)
-                | and (zipWith (<=) (cycle $ Set.toAscList timeLeft)
-                                    (sort $ Map.elems (p.time)))
-                  && flow1 >= p.totalFlow -> False
-                | otherwise               -> True
+    checkVisited (p:: Path)
+        | p.potential + p.totalFlow <= optimum.totalFlow = False
+        | otherwise =
+            case Map.lookup (Set.fromList $ Map.elems p.last, p.path) visited of
+                Nothing -> True
+                Just (timeLeft, flow1)
+                    | and (zipWith (<=) (cycle $ Set.toAscList timeLeft)
+                                        (sort $ Map.elems (p.time)))
+                    && flow1 >= p.totalFlow -> False
+                    | otherwise               -> True
 
     addPath visited (p::Path) = Map.insert (Set.fromList $ Map.elems p.last, p.path)
                                            (Set.fromList $ Map.elems p.time, p.totalFlow)
@@ -103,12 +110,14 @@ maxPresRelief n totalTime m =
            (Seq.singleton path0)
            (Map.singleton (Set.singleton "AA", path0.path)
                           (Set.singleton totalTime, path0.totalFlow))
-           path0
+           path0 {potential = 0}
   where
     path0 = Path {last = Map.fromList $ zip [1..n] (repeat "AA")
                  ,path = Set.singleton "AA"
                  ,time = Map.fromList $ zip [1..n] (repeat totalTime)
-                 ,totalFlow = 0}
+                 ,totalFlow = 0
+                 ,potential = maxPotential}
+    maxPotential = sum $ fmap flow m
 
 
 findShortest :: HashMap String Valve -> String -> String -> Int
