@@ -75,6 +75,7 @@ executable day12
     import:           shared_properties
     build-depends:    array ^>=0.5,
                       containers ^>=0.6
+    other-modules:    Djistra
     main-is:          day12.hs
 
 executable day13
@@ -89,3 +90,10 @@ executable day14
 executable day15
     import:           shared_properties
     main-is:          day15.hs
+
+executable day16
+    import:           shared_properties
+    build-depends:    unordered-containers ^>=0.2,
+                      containers ^>=0.6
+    other-modules:    Djistra
+    main-is:          day16.hs
