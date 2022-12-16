@@ -7,69 +7,108 @@
 module Main where
 
 
-import AoC (applyInput, commaSepP, intP)
-import Text.Parsec.String (Parser)
-import Data.HashMap.Strict (HashMap, (!))
+import           AoC                 (applyInput, commaSepP, intP)
+import           Data.Bifunctor      (bimap)
+import           Data.Foldable       (minimumBy)
+import           Data.Function       (on)
+import           Data.HashMap.Strict (HashMap, (!))
 import qualified Data.HashMap.Strict as Map
-import Text.Parsec (sepBy, spaces, string, many1, upper, (<|>), try, sepEndBy)
-import Data.List ((\\), foldl')
-import Data.Sequence (Seq ((:<|)), ViewL ((:<)), (><))
-import qualified Data.Sequence as Seq
-import qualified Data.Set as Set
-import Data.Bifunctor (bimap)
-import Data.Set (Set)
-import Data.Function (on)
+import           Data.List           ((\\), foldl', sort)
+import           Data.Sequence       (Seq ((:<|)), ViewL ((:<)), (><))
+import qualified Data.Sequence       as Seq
+import           Data.Set            (Set)
+import qualified Data.Set            as Set
+import           Text.Parsec         (sepBy
+                                     ,spaces
+                                     ,string
+                                     ,many1
+                                     ,upper
+                                     ,(<|>)
+                                     ,try
+                                     ,sepEndBy)
+import           Text.Parsec.String (Parser)
 
 
-data Valve  = Valve {flow :: Int, tunnels :: HashMap String Int} deriving (Show, Eq)
+data Valve = Valve {flow :: Int, tunnels :: HashMap String Int} deriving (Show, Eq)
 
-data Path = Path {last :: String, path :: Set String, time :: Int, totalFlow :: Int}
-    deriving (Show, Eq)
+data Path = Path {last :: HashMap Int String
+                 ,path :: Set String
+                 ,time :: HashMap Int Int
+                 ,totalFlow :: Int}
+            deriving (Show, Eq)
 
 
 search :: HashMap String Valve
+       -> Int
        -> Seq Path
-       -> HashMap (String, Set String) (Int, Int)
+       -> HashMap (Set String, Set String) (Set Int, Int)
        -> Path
        -> Int
-search m paths visited optimum =
+search m n paths visited optimum =
     case paths of
         Seq.Empty -> optimum.totalFlow
         p:<|ps    ->
-            let dsts     = filter (checkPath p) $ Map.toList $ (m ! p.last).tunnels
-                newPaths = filter checkVisited $ addDst p <$>  dsts
+            let nexts    = Map.toList p.time
+                alldsts  = map (filterCost p) nexts
+                newPaths = concatMap (filterVisited p) alldsts
             in case newPaths of
-                [] -> search m ps visited (maxFlow optimum p)
+                [] -> search m n ps visited (maxFlow optimum p)
                 _  -> search m
+                            n
                             (Seq.fromList newPaths >< ps)
                             (foldl' addPath visited newPaths)
                             optimum
   where
-    addDst p (dst, cost) =
-        let tLeft = p.time - cost - 1
-        in Path {last = dst
-                ,path = Set.insert dst p.path
-                ,time = tLeft
-                ,totalFlow = p.totalFlow + tLeft * (m ! dst).flow}
-    checkPath p (dst, cost) =
-        p.time - cost - 1 >= 0 &&
+    filterCost p (nxt, tNxt) =
+        ((nxt, tNxt),) <$> filter (checkPath p tNxt)
+                        $ Map.toList
+                        $ tunnels (m ! (p.last ! nxt))
+
+    filterVisited p ((nxt, tNxt), dsts) = filter checkVisited $ addDst p nxt tNxt <$> dsts
+
+
+    addDst p nxt t (dst, cost) =
+        let tLeft = t - cost - 1
+        in Path {last      = Map.insert nxt dst p.last
+                ,path      = Set.insert dst p.path
+                ,time      = Map.insert nxt tLeft p.time
+                ,totalFlow = p.totalFlow + tLeft * (m ! dst).flow }
+
+    checkPath p t (dst, cost) =
+        t - cost - 1 >= 1 &&
         Set.notMember dst p.path
+
     checkVisited (p:: Path) =
-        case Map.lookup (p.last, p.path) visited of
+        case Map.lookup (Set.fromList $ Map.elems p.last, p.path) visited of
             Nothing -> True
             Just (timeLeft, flow1)
-                | timeLeft <= p.time && flow1 >= p.totalFlow -> False
-                | otherwise                                  -> True
-    addPath visited (p::Path) = Map.insert (p.last, p.path) (p.time, p.totalFlow) visited
+                | and (zipWith (<=) (cycle $ Set.toAscList timeLeft)
+                                    (sort $ Map.elems (p.time)))
+                  && flow1 >= p.totalFlow -> False
+                | otherwise               -> True
+
+    addPath visited (p::Path) = Map.insert (Set.fromList $ Map.elems p.last, p.path)
+                                           (Set.fromList $ Map.elems p.time, p.totalFlow)
+                                           visited
+
     maxFlow (p1::Path) (p2 :: Path)
         | p1.totalFlow >= p2.totalFlow = p1
         | otherwise                    = p2
 
 
-maxPresRelief :: HashMap String Valve -> Int
-maxPresRelief m = search m (Seq.singleton path0) (Map.singleton (path0.last, path0.path) (path0.time, path0.totalFlow)) path0
+maxPresRelief :: Int -> Int -> HashMap String Valve -> Int
+maxPresRelief n totalTime m =
+    search m
+           n
+           (Seq.singleton path0)
+           (Map.singleton (Set.singleton "AA", path0.path)
+                          (Set.singleton totalTime, path0.totalFlow))
+           path0
   where
-    path0 = Path {last = "AA", path = Set.singleton "AA", time = 30, totalFlow = 0}
+    path0 = Path {last = Map.fromList $ zip [1..n] (repeat "AA")
+                 ,path = Set.singleton "AA"
+                 ,time = Map.fromList $ zip [1..n] (repeat totalTime)
+                 ,totalFlow = 0}
 
 
 findShortest :: HashMap String Valve -> String -> String -> Int
@@ -101,11 +140,11 @@ simplifyMap m = Map.fromList simplifyed
 
 
 solveP2 :: HashMap String Valve -> Int
-solveP2 = undefined
+solveP2 = maxPresRelief 2 26 . simplifyMap
 
 
 solveP1 :: HashMap String Valve -> Int
-solveP1 = maxPresRelief . simplifyMap
+solveP1 = maxPresRelief 1 30 . simplifyMap
 
 
 
@@ -126,4 +165,4 @@ valvesP = Map.fromList <$> (valveP `sepEndBy` spaces)
 
 
 main :: IO ()
-main = applyInput valvesP solveP1 (const 0)
+main = applyInput valvesP solveP1 solveP2
