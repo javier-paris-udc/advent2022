@@ -95,5 +95,16 @@ executable day16
     import:           shared_properties
     build-depends:    unordered-containers ^>=0.2,
                       containers ^>=0.6
-    other-modules:    Djistra
     main-is:          day16.hs
+
+executable day17
+    import:           shared_properties
+    build-depends:    unordered-containers ^>=0.2,
+                      mtl ^>=2.3
+    main-is:          day17.hs
+
+executable day18
+    import:           shared_properties
+    build-depends:    unordered-containers ^>=0.2,
+                      extra ^>=1.7
+    main-is:          day18.hs
