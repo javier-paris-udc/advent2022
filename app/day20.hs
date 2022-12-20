@@ -19,7 +19,7 @@ mixOne m seq i
     | otherwise  = Seq.insertAt to i $ Seq.deleteAt from seq
   where
     from = fromJust $ Seq.findIndexL (==i) seq
-    to  = (from + m ! i) `mod` (Map.size m - 1)
+    to   = (from + m ! i) `mod` (Map.size m - 1)
 
 mixAll :: IntMap Int -> Seq Int -> Seq Int
 mixAll m seq = foldl' (mixOne m) seq [0 .. Map.size m - 1]
@@ -39,7 +39,7 @@ solve n l = sum $ map (Seq.index resSeq) positions
 
 
 solveP2 :: [Int] -> Int
-solveP2 l = solve 10 (map (* 811589153) l)
+solveP2 = solve 10 . map (* 811589153)
 
 
 solveP1 :: [Int] -> Int
