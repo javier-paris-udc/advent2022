@@ -119,3 +119,9 @@ executable day20
     import:           shared_properties
     build-depends:    containers ^>=0.6
     main-is:          day20.hs
+
+executable day21
+    import:           shared_properties
+    build-depends:    unordered-containers ^>=0.2,
+                      mtl ^>=2.3
+    main-is:          day21.hs
