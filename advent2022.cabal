@@ -125,3 +125,15 @@ executable day21
     build-depends:    unordered-containers ^>=0.2,
                       mtl ^>=2.3
     main-is:          day21.hs
+
+executable day22
+    import:           shared_properties
+    build-depends:    array ^>=0.5,
+                      containers ^>=0.6
+    main-is:          day22.hs
+
+executable day23
+    import:           shared_properties
+    build-depends:    unordered-containers ^>=0.2,
+                      utility-ht ^>=0.0
+    main-is:          day23.hs
