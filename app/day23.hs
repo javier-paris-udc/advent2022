@@ -5,8 +5,6 @@ import           AoC                 (applyInput)
 import           Data.Bifunctor      (first, second)
 import           Data.Function       ((&), on)
 import           Data.Function.HT    (nest)
-import           Data.HashMap.Strict (HashMap, (!?))
-import qualified Data.HashMap.Strict as Map
 import           Data.HashSet        (HashSet)
 import qualified Data.HashSet        as Set
 import           Data.List           (find, foldl')
@@ -52,20 +50,20 @@ neighbours board (x, y) =
                   ,(x + 1, y - 1), (x + 1, y), (x + 1, y + 1)]
 
 
-nextPos :: HashSet Coord -> [Dir] -> HashMap Coord Coord -> Coord -> HashMap Coord Coord
+nextPos :: HashSet Coord -> [Dir] -> HashSet Coord -> Coord -> HashSet Coord
 nextPos currentBoard dirs nextBoard c
-    | null cNeighbours = Map.insert c c nextBoard
+    | null cNeighbours = Set.insert c nextBoard
     | otherwise =
         case freeDir of
-            Nothing  -> Map.insert c c nextBoard
+            Nothing  -> Set.insert c nextBoard
             Just dir ->
                 let next = move dir c
-                in case nextBoard !? next of
-                    Nothing    -> Map.insert next c nextBoard
-                    Just other -> nextBoard
-                                & Map.delete next
-                                & Map.insert other other
-                                & Map.insert c c
+                in if Set.member next nextBoard
+                    then nextBoard
+                       & Set.delete next
+                       & Set.insert (move dir next)
+                       & Set.insert c
+                    else Set.insert next nextBoard
   where
     cNeighbours = neighbours currentBoard c
     freeDir     = find (\d -> not $ any (isInDir d c) cNeighbours) dirs
@@ -73,7 +71,7 @@ nextPos currentBoard dirs nextBoard c
 
 turn :: (Board, Dir) -> (Board, Dir)
 turn (b, d) =
-    (Map.keysSet (foldl' (nextPos b dirs) Map.empty b), nextDir d)
+    (foldl' (nextPos b dirs) Set.empty b, nextDir d)
   where
     dirs = take 4 $ iterate nextDir d
 
