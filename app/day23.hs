@@ -2,16 +2,14 @@ module Main where
 
 
 import           AoC                 (applyInput)
-import           Control.Applicative (liftA2)
-import           Control.Monad       (mplus)
-import           Data.Bifunctor      (first, bimap, second)
+import           Data.Bifunctor      (first, second)
 import           Data.Function       ((&), on)
 import           Data.Function.HT    (nest)
 import           Data.HashMap.Strict (HashMap, (!?))
 import qualified Data.HashMap.Strict as Map
 import           Data.HashSet        (HashSet)
 import qualified Data.HashSet        as Set
-import           Data.List           (foldl', intercalate, find)
+import           Data.List           (find, foldl')
 import           Text.Parsec.String  (Parser)
 import           Text.Parsec         ((<|>), char, many1, sepEndBy, spaces)
 
@@ -46,7 +44,7 @@ move d =
 
 
 neighbours :: HashSet Coord -> Coord -> [Coord]
-neighbours board c@(x, y) =
+neighbours board (x, y) =
     filter (`Set.member` board) neighCoords
   where
     neighCoords = [(x - 1, y - 1), (x - 1, y), (x - 1, y + 1)
@@ -81,7 +79,7 @@ turn (b, d) =
 
 
 solveP2 :: Board -> Int
-solveP2 b = repeatUntilEqual b (turn (b, N)) 1
+solveP2 board = repeatUntilEqual board (turn (board, N)) 1
   where
     repeatUntilEqual prevB (b, dir) n
         | b == prevB = n
