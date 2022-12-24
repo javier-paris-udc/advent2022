@@ -138,3 +138,9 @@ executable day23
     build-depends:    unordered-containers ^>=0.2,
                       utility-ht ^>=0.0
     main-is:          day23.hs
+
+executable day24
+    import:           shared_properties
+    build-depends:    pqueue ^>=1.4,
+                      unordered-containers ^>=0.2
+    main-is:          day24.hs
