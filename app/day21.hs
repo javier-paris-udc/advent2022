@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 module Main where
 
 
@@ -41,6 +42,7 @@ opToFun op =
         Sub -> (-)
         Mul -> (*)
         Div -> div
+        Eql -> const id
 
 
 eval :: String -> Reader (HashMap String Expr) Int
@@ -60,20 +62,22 @@ eval name = do
 addRevVars :: HashMap String String -> String -> Expr -> HashMap String String
 addRevVars m var val =
     case val of
-        Expr op v1 v2 -> Map.insert v2 var $ Map.insert v1 var m
-        _             -> m
+        Expr _ v1 v2 -> Map.insert v2 var $ Map.insert v1 var m
+        _            -> m
 
 
 computeVal :: Int -> Int -> Op -> Oper -> Int
 computeVal total val1 op side =
     case op of
-        Add               -> total - val1
-        Mul               -> total `div` val1
-        Sub | side == One -> total + val1
-            | side == Two -> val1 - total
-        Div | side == One -> total * val1
-            | side == Two -> val1 `div` total
-        Eql               -> val1
+        Add -> total - val1
+        Mul -> total `div` val1
+        Sub -> case side of
+                One -> total + val1
+                Two -> val1 - total
+        Div -> case side of
+                One -> total * val1
+                Two -> val1 `div` total
+        Eql -> val1
 
 
 findHumnVal :: Int -> String -> [String] -> Reader (HashMap String Expr) Int
@@ -88,6 +92,7 @@ findHumnVal val var (v:vs) = do
             | otherwise -> do
                 valv1 <- eval v1
                 findHumnVal (computeVal val valv1 op Two) v2 vs
+        _ -> undefined
 
 
 -- Solvers
@@ -95,7 +100,10 @@ findHumnVal val var (v:vs) = do
 solveP2 :: HashMap String Expr -> Int
 solveP2 m = runReader (findHumnVal 0 "root" pathToHumn) mWithRootEq
   where
-    mWithRootEq   = Map.adjust (\(Expr _ v1 v2) -> Expr Eql v1 v2) "root" m
+    mWithRootEq   = Map.adjust (\case (Expr _ v1 v2) -> Expr Eql v1 v2
+                                      _ -> undefined)
+                                "root"
+                                m
     reverseMap    = Map.foldlWithKey' addRevVars Map.empty mWithRootEq
     pathToHumn    = reverse $ unfoldr nextUp "humn"
 
