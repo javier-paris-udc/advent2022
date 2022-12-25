@@ -7,7 +7,7 @@ import           Data.Bifunctor      (bimap, second)
 import           Data.HashSet        (HashSet, fromList)
 import qualified Data.HashSet        as Set
 import           Data.List           (find)
-import           Text.Parsec         (newline, sepBy, sepEndBy, spaces, string)
+import           Text.Parsec         (newline, sepBy, sepEndBy, string)
 import           Text.Parsec.String  (Parser)
 
 type Coord   = (Int, Int)
@@ -29,13 +29,13 @@ se = bimap (+1) (+1)
 
 
 repeatDropSand :: (Coord -> CaveMap -> Bool) -> Int -> CaveMap -> Int
-repeatDropSand atEnd floor cave =
-    iterate 0 cave
+repeatDropSand atEnd floorLevel =
+    iter 0
   where
-    iterate !i cave =
-        case dropSand cave floor source of
+    iter !i cave =
+        case dropSand cave floorLevel source of
            x | atEnd x cave -> i
-             | otherwise    -> iterate (i+1) (Set.insert x cave)
+             | otherwise    -> iter (i+1) (Set.insert x cave)
 
 
 dropSand :: CaveMap -> Int -> Coord -> Coord
@@ -48,13 +48,13 @@ dropSand cave maxHeight c
 
 
 solveP2 :: CaveMap -> Int
-solveP2 cave = repeatDropSand (\c cave-> Set.member source cave) floor cave
+solveP2 cave = repeatDropSand (\_ caveSt -> Set.member source caveSt) floorLevel cave
   where
-    floor = 1 + maximum (Set.map snd cave)
+    floorLevel = 1 + maximum (Set.map snd cave)
 
 
 solveP1 :: CaveMap -> Int
-solveP1 cave = repeatDropSand (\c cave -> snd c == abyss) abyss cave
+solveP1 cave = repeatDropSand (\c _ -> snd c == abyss) abyss cave
   where
     abyss = maximum $ Set.map snd cave
 
