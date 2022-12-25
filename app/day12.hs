@@ -3,22 +3,17 @@ module Main where
 
 import           AoC            (applyInputS)
 import           Data.Array     (Array
-                                ,listArray
-                                ,Ix (inRange)
-                                ,bounds
                                 ,(!)
-                                ,assocs)
-import           Data.Bifunctor (first, second, bimap)
+                                ,bounds
+                                ,Ix (inRange)
+                                ,listArray
+                                )
+import           Data.Bifunctor (first, second)
 import           Data.Char      (ord)
-import           Data.Foldable  (foldl')
-import           Data.Maybe     (fromJust, catMaybes, mapMaybe)
-import qualified Data.Sequence  as Seq
-import           Data.Sequence  (ViewL((:<)), Seq)
-import qualified Data.Set       as Set
+import           Data.Maybe     (fromJust)
 import           Djistra        (djistra)
 import           Text.Parsec    (Parsec
                                 ,getState
-                                ,putState
                                 ,lower
                                 ,(<|>)
                                 ,char
@@ -87,12 +82,12 @@ heightCharP = do
     return (ord c - ord 'a')
   where
     startP = do
-        char 'S'
+        _   <- char 'S'
         pos <- fst <$> getState
         modifyState $ second $ first $ const $ Just pos
         return 'a'
     endP = do
-        char 'E'
+        _   <- char 'E'
         pos <- fst <$> getState
         modifyState $ second $ second $ const $ Just pos
         return 'z'
