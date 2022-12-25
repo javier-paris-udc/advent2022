@@ -3,7 +3,7 @@ module Main where
 import AoC                (applyInput, commaSepP, intP)
 import Control.Arrow      ((>>>))
 import Data.List          (findIndices, sort, unfoldr)
-import Text.Parsec        ((<|>), between, char, many, newline, sepBy, sepEndBy, spaces)
+import Text.Parsec        ((<|>), between, char, sepBy, sepEndBy, spaces)
 import Text.Parsec.String (Parser)
 
 
