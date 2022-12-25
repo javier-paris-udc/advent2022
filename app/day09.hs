@@ -2,8 +2,8 @@ module Main where
 
 import AoC                (applyInput, intP)
 import Data.Biapplicative (biliftA2)
-import Data.Bifunctor     (bimap, first, second)
-import Data.List          (nub, scanl')
+import Data.Bifunctor     (first, second)
+import Data.List          (scanl')
 import Data.Set           (fromList, size)
 import Text.Parsec.String (Parser)
 import Text.Parsec        (choice, sepEndBy, spaces, string)
@@ -43,6 +43,7 @@ follow c1 c2
 
 
 move :: [Coord] -> Move -> [Coord]
+move []       _   = []
 move (h:rest) mov = newRope
   where
     newRope = mov h : zipWith follow newRope rest
