@@ -11,12 +11,11 @@ import           Control.Monad.State.Lazy (State, execState, gets, modify)
 import qualified Data.IntMap              as Map
 import           Data.IntMap              (IntMap, (!))
 import           Data.List                (sortBy)
-import           Data.Maybe               (fromMaybe)
-import           Text.Parsec              (spaces
+import           Text.Parsec              (between
+                                          ,spaces
                                           ,string
                                           ,char
                                           ,(<|>)
-                                          ,sepBy
                                           ,sepEndBy)
 import           Text.Parsec.String       (Parser)
 
@@ -32,10 +31,10 @@ data Monkey = Monkey { items    :: [Int]
 -- Round runner
 
 giveItem :: (Int -> Int) -> Int -> State (IntMap Monkey) ()
-giveItem test worry =
-    modify $ Map.adjust (addItem worry) (test worry)
+giveItem testF worry =
+    modify $ Map.adjust (addItem worry) (testF worry)
   where
-    addItem i Monkey { .. } = Monkey { items = worry : items, .. }
+    addItem _ Monkey { .. } = Monkey { items = worry : items, .. }
 
 
 monkeyRound :: (Int -> Int) -> Int -> State (IntMap Monkey) ()
@@ -80,35 +79,31 @@ solveP1 = solve (`div` 3) 20
 
 itemsP :: Parser [Int]
 itemsP = do
-    string "Starting items: "
-    intP `sepEndBy` commaSepP
+    string "Starting items: " >> (intP `sepEndBy` commaSepP)
 
 
 operationP :: Parser (Int -> Int)
 operationP = do
-    string "Operation: new = old "
-    op <- charToOp <$> (char '*' <|> char '+')
+    _  <- string "Operation: new = old "
+    op <- (char '*' >> return (*)) <|> (char '+' >> return (+))
 
     blanksP
     operand <- (string "old" >> return Nothing) <|> (Just <$> intP)
 
     return $ maybe (op <*> id) op operand
-  where
-    charToOp '+' = (+)
-    charToOp '*' = (*)
 
 
 testP :: Parser (Int, Int -> Int)
 testP = do
-    string "Test: divisible by "
+    _    <- string "Test: divisible by "
     zmod <- intP
     spaces
 
-    string "If true: throw to monkey "
+    _       <- string "If true: throw to monkey "
     monkeyT <- intP
     spaces
 
-    string "If false: throw to monkey "
+    _       <- string "If false: throw to monkey "
     monkeyF <- intP
 
     return (zmod, test zmod monkeyT monkeyF)
@@ -120,9 +115,7 @@ testP = do
 
 monkeyP :: Parser (Int, Monkey)
 monkeyP = do
-    string "Monkey "
-    idx <- intP
-    string ":"
+    idx <- between (string "Monkey ") (string ":") intP
     spaces
 
     items <- itemsP
