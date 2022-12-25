@@ -9,7 +9,7 @@ import Text.Parsec    (Parsec
                       ,sepEndBy
                       ,string)
 import Data.Bifunctor (bimap, first)
-import Data.List      (intercalate, intersperse, unfoldr)
+import Data.List      (intercalate, unfoldr)
 import Data.Vector    (Vector, (!), fromList)
 
 
@@ -34,12 +34,12 @@ solveP2 v = intercalate "\n" $ groupIn 40 $ map pixelAt [0..239]
 solveP1 :: RegValues -> Int
 solveP1 v = sum $ map (\i -> i * v `at` i) [20, 60, 100, 140, 180, 220]
   where
-    at v i = v ! (i - 1)
+    at val i = val ! (i - 1)
 
 
 noopP :: Parsec String CPUState [Int]
 noopP = do
-    string "noop"
+    _ <- string "noop"
     v <- snd <$> getState
     modifyState (first (+1))
     return [v]
@@ -47,8 +47,7 @@ noopP = do
 
 addxP :: Parsec String CPUState [Int]
 addxP = do
-    string "addx"
-    blanksP
+    string "addx" >> blanksP
     inc <- intP
     v1  <- snd <$> getState
     modifyState (bimap (+2) (+inc))
