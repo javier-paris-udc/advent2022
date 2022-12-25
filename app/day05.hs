@@ -12,9 +12,9 @@ import           Text.Parsec        (sepEndBy1
                                     ,char
                                     ,(<|>)
                                     ,anyChar
-                                    ,try)
+                                    ,try, between)
 import           Data.List          (transpose, foldl')
-import           Data.Maybe         (fromJust, isJust, catMaybes)
+import           Data.Maybe         (catMaybes)
 
 
 type Stack = Map Int [Char]
@@ -48,7 +48,7 @@ elemP = do
   where
     emptyP = try (string "   ") >> return Nothing
     charP = do
-        char '['; c <- anyChar; char ']'
+        c <- between (char '[') (char ']') anyChar
         return $ Just c
 
 
@@ -63,12 +63,9 @@ stackP = do
 
 opP :: Parser Op
 opP = do
-    string "move "
-    count <- intP
-    string " from "
-    from   <- intP
-    string " to "
-    to     <- intP
+    count <- string "move "  >> intP
+    from  <- string " from " >> intP
+    to    <- string " to "   >> intP
     return (Op from to count)
 
 
