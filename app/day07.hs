@@ -68,8 +68,7 @@ entryP =
 
 lsP :: Parsec String Path (Path, [Entry])
 lsP = do
-    string "ls"
-    newline
+    _       <- string "ls" >> newline
     cwd     <- getState
     entries <- entryP `sepEndBy1` newline
     return (cwd, entries)
@@ -77,8 +76,7 @@ lsP = do
 
 cdP :: Parsec String Path ()
 cdP = do
-    string "cd"
-    blanksP
+    string "cd" >> blanksP
     name <- nameP
     spaces
     case name of
@@ -89,8 +87,7 @@ cdP = do
 
 commandP :: Parsec String Path (Maybe (Path, [Entry]))
 commandP = do
-    char '$'
-    blanksP
+    char '$' >> blanksP
     (cdP >> return Nothing) <|> (Just <$> lsP)
 
 
