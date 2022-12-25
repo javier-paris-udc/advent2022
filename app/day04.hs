@@ -3,7 +3,6 @@ module Main where
 import AoC                (applyInput, intP)
 import Text.Parsec.String (Parser)
 import Text.Parsec        (sepEndBy1, newline, char)
-import Foreign            (intPtrToPtr)
 
 
 type Sec     = (Int, Int)
@@ -36,8 +35,7 @@ secP :: Parser Sec
 secP =
     do
         from <- intP
-        char '-'
-        to   <- intP
+        to   <- char '-' >> intP
         return (from, to)
 
 
@@ -45,8 +43,7 @@ secPairP :: Parser SecPair
 secPairP =
     do
         sec1 <- secP
-        char ','
-        sec2 <- secP
+        sec2 <- char ',' >> secP
         return (sec1, sec2)
 
 
