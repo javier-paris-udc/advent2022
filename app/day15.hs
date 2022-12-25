@@ -51,7 +51,7 @@ overlap i1 i2 = not (i1.end < i2.start-1 || i2.end+1 < i1.start)
 
 
 inside :: Int -> Interval -> Bool
-inside x i = x >= i.start && x<= i.end
+inside row i = row >= i.start && row <= i.end
 
 
 -- Row functions
@@ -68,10 +68,10 @@ sensorToRow row s
 
 beaconsAt :: [Coord] -> [Interval] -> Int
 beaconsAt beacons intervals =
-    length $ filter (\b -> any (inside b) intervals) beacons
+    length $ filter (\b -> any (insideC b) intervals) beacons
   where
-    inside :: Coord -> Interval -> Bool
-    inside coord int = coord.x >= int.start && coord.y <= int.end
+    insideC :: Coord -> Interval -> Bool
+    insideC coord int = coord.x >= int.start && coord.y <= int.end
 
 
 -- Solver functions
@@ -118,16 +118,15 @@ sensorsP = do
     sensorP `sepEndBy` spaces
   where
     sensorP = do
-        string "Sensor at x="
+        _       <- string "Sensor at x="
         sensorX <- intP
         commaSepP
-        string "y="
+        _       <- string "y="
         sensorY <- intP
-        string ":" ; spaces
-        string "closest beacon is at x="
+        _       <- string ":" >> spaces >> string "closest beacon is at x="
         beaconX <- intP
         commaSepP
-        string "y="
+        _       <- string "y="
         beaconY <- intP
         return $ Sensor {pos = Coord sensorX sensorY, beacon = Coord beaconX beaconY}
 
