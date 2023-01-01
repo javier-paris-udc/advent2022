@@ -1,17 +1,14 @@
 module AoC where
 
 import Text.Parsec        (char
-                          ,(<|>)
                           ,many1
                           ,digit
                           ,option
                           ,oneOf
-                          ,ParseError
                           ,Parsec
                           ,runParser
                           ,spaces
                           ,try, string)
-import Text.Parsec.Pos    (SourceName)
 import Text.Parsec.String (Parser)
 import System.Environment (getArgs, getProgName)
 import Control.Monad      (void)
@@ -42,11 +39,12 @@ commaSepP :: Parsec String a ()
 commaSepP = sep ","
 
 
-getParsedInput :: Parsec String s a -> s -> String -> IO a
+getParsedInput :: Parsec String s a -> s -> String -> IO (Maybe a)
 getParsedInput parser state file = do
     fileContents <- readFile file
-    let Right parseRes = runParser parser state file fileContents
-    return parseRes
+    case runParser parser state file fileContents of
+        Right res -> return $ Just res
+        Left  _   -> return Nothing
 
 
 parseFromArg :: Parsec String s a -> s -> IO (Either String a)

@@ -130,6 +130,7 @@ quality n b = search maxResources [initPath] (Set.singleton initPath) 0 b
     initPath     = (robots, resources, n)
     bpResReq res = maximum $ map snd $ concatMap (filter ((==res).fst)) (robotCost b)
 
+
 solveP2 :: [BluePrint] -> Int
 solveP2 = product . map (quality 32). take 3
 

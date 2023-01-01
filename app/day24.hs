@@ -32,8 +32,7 @@ data Valley = Valley {rows  :: Int
 
 data Path   = Path {steps     :: Int
                    ,toGoal    :: Int
-                   ,tile      :: Coord
-                   ,pathWinds :: Valley} deriving (Show)
+                   ,tile      :: Coord} deriving (Show)
 
 
 instance Eq Path where
@@ -97,55 +96,57 @@ possibleMoves coord valley =
                             && col >= 0 && col < cols valley))
 
 
-buildPath :: Path -> Coord -> Valley -> Coord -> Path
-buildPath p to valley c =
-    Path {steps     = steps p + 1
-         ,toGoal    = distance c to
-         ,tile      = c
-         ,pathWinds = valley}
+expand :: Valley -> Coord -> Path -> [Path]
+expand valley to p =
+    let newTiles  = possibleMoves (tile p) valley
+    in map buildPath newTiles
+  where
+    buildPath c =
+        Path {steps    = steps p + 1
+            ,toGoal    = distance c to
+            ,tile      = c}
 
 
-expand :: Coord -> Path -> [Path]
-expand to p =
-    let newValley = moveWind (pathWinds p)
-        newTiles  = possibleMoves (tile p) newValley
-    in map (buildPath p to newValley) newTiles
-
-
-search :: MinQueue Path -> Coord -> Path
-search q to =
+search :: [Valley] -> MinQueue Path -> Coord -> Path
+search valleys q to =
     case PQ.getMin q of
         Nothing   -> undefined
         Just path
             | tile path == to -> path
             | otherwise       ->
-                let newPaths = filter (notMember q) $ expand to path
+                let valley   = valleys !! (steps path + 1)
+                    newPaths = filter (notMember q) $ expand valley to path
                     newQ     = q
                              & PQ.deleteMin
                              & flip (foldl' (flip PQ.insert)) newPaths
-                in search newQ to
+                in search valleys newQ to
   where
     notMember pq path = PQ.null $ PQ.filter (== path) pq
 
 
-astar :: Coord -> Coord -> Valley -> Path
-astar from to valley = search (PQ.singleton path0) to
+astar :: Coord -> Coord -> [Valley] -> Path
+astar from to valleys = search valleys (PQ.singleton path0) to
   where
-    path0 = Path {steps     = 0
-                 ,toGoal    = distance from to
-                 ,tile      = from
-                 ,pathWinds = valley}
+    path0   = Path {steps     = 0
+                   ,toGoal    = distance from to
+                   ,tile      = from}
 
 
-solveP2 :: Valley -> Int
-solveP2 valley =
-    let firstGo  = astar (-1, 0) (rows valley, cols valley - 1) valley
-        goBack   = astar (rows valley, cols valley -1) (-1, 0) (pathWinds firstGo)
-        secondGo = astar (-1, 0) (rows valley, cols valley - 1) (pathWinds goBack)
+solveP2 :: [Valley] -> Int
+solveP2 valleys =
+    let nRows    = rows $ head valleys
+        nCols    = cols $ head valleys
+        firstGo  = astar (-1, 0) (nRows, nCols - 1) valleys
+        goBack   = astar (nRows, nCols -1) (-1, 0) (drop (steps firstGo) valleys)
+        secondGo = astar (-1, 0) (nRows, nCols - 1) (drop (steps firstGo + steps goBack) valleys)
     in steps secondGo + steps goBack + steps firstGo
 
-solveP1 :: Valley -> Int
-solveP1 valley = steps $ astar (-1,0) (rows valley, cols valley - 1) valley
+
+solveP1 :: [Valley] -> Int
+solveP1 valleys = steps $ astar (-1,0) (nRows, nCols - 1) valleys
+  where
+    nRows = rows (head valleys)
+    nCols = cols (head valleys)
 
 
 rowP :: Parser [(Int, [Dir])]
@@ -159,17 +160,18 @@ rowP = do
            & map (second (singleton . charToDir))
 
 
-valleyP :: Parser Valley
+valleyP :: Parser [Valley]
 valleyP = do
     _      <- string "#."
     nCols  <- length <$> many (char '#')
     _      <- newline
     valley <- try rowP `sepEndBy` newline
 
-    let nRows  = length valley
-        vWinds = concat $ zipWith (\i -> map (first (i, ))) [0..] valley
+    let nRows   = length valley
+        vWinds  = concat $ zipWith (\i -> map (first (i, ))) [0..] valley
+        valley0 = Valley {rows = nRows, cols = nCols, winds = Map.fromList vWinds}
 
-    return Valley {rows = nRows, cols = nCols, winds = Map.fromList vWinds}
+    return $ iterate moveWind valley0
 
 
 main :: IO ()
